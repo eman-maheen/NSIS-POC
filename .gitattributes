@@ -1,0 +1,12 @@
+* text=auto
+*.cpp text
+*.h text
+*.yml text
+*.nsi text
+*.txt text
+*.md text
+*.ui text
+
+# Binary files
+*.exe binary
+*.dll binary
