@@ -1,0 +1,36 @@
+# Qt-specific
+*.user
+*.autosave
+
+# Build directories
+out/
+build/
+debug/
+release/
+.vs/
+
+# CMake
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+*.cmake
+!CMakeLists.txt
+!CMakePresets.json
+
+# Compiled files
+*.obj
+*.exe
+*.dll
+*.lib
+*.pdb
+*.ilk
+*.exp
+moc_*.cpp
+ui_*.h
+qrc_*.cpp
+
+# IDE specific
+.vscode/
+*.sln
+*.vcxproj
+*.vcxproj.filters
