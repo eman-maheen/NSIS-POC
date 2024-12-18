@@ -42,9 +42,10 @@ jobs:
           vs-version: '17.0'
 
       - name: Configure CMake
-        working-directory: ${{ runner.temp }}\build
         run: |
-          cmake -S ${{ env.SOURCE_DIR }} -B ${{ runner.temp }}\build -G "Visual Studio 17 2022" -A x64 ^
+          mkdir -p ${{ runner.temp }}\build
+          cd ${{ runner.temp }}\build
+          cmake ${{ env.SOURCE_DIR }} -G "Visual Studio 17 2022" -A x64 ^
           -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} ^
           -DCMAKE_PREFIX_PATH=${{ env.Qt6_DIR }}
 
