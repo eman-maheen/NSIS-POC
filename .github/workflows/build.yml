@@ -59,10 +59,13 @@ jobs:
           mkdir ${{ env.SOURCE_DIR }}\deploy\bin
           copy test-project.exe ${{ env.SOURCE_DIR }}\deploy\bin\
           windeployqt ${{ env.SOURCE_DIR }}\deploy\bin\test-project.exe --release --compiler-runtime
-          copy C:\Windows\System32\concrt140.dll ${{ env.SOURCE_DIR }}\deploy\bin\
-          copy C:\Windows\System32\vccorlib140.dll ${{ env.SOURCE_DIR }}\deploy\bin\
-          copy C:\Windows\System32\msvcp140.dll ${{ env.SOURCE_DIR }}\deploy\bin\
-          copy C:\Windows\System32\vcruntime140.dll ${{ env.SOURCE_DIR }}\deploy\bin\
+          
+          # Copy MSVC Runtime DLLs directly from Windows System32
+          copy "C:\Windows\System32\msvcp140.dll" ${{ env.SOURCE_DIR }}\deploy\bin\
+          copy "C:\Windows\System32\msvcp140_1.dll" ${{ env.SOURCE_DIR }}\deploy\bin\
+          copy "C:\Windows\System32\msvcp140_2.dll" ${{ env.SOURCE_DIR }}\deploy\bin\
+          copy "C:\Windows\System32\vcruntime140.dll" ${{ env.SOURCE_DIR }}\deploy\bin\
+          copy "C:\Windows\System32\vcruntime140_1.dll" ${{ env.SOURCE_DIR }}\deploy\bin\
 
       - name: Install NSIS
         run: choco install nsis -y
