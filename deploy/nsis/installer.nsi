@@ -10,7 +10,7 @@ VIAddVersionKey "CompanyName" "Eman's company"
 VIAddVersionKey "FileVersion" "1.0.0"
 VIAddVersionKey "ProductVersion" "1.0.0"
 VIAddVersionKey "FileDescription" "Test Program Installer"
-VIAddVersionKey "LegalCopyright" "© 2024 Your Company Name. All rights reserved."
+VIAddVersionKey "LegalCopyright" " 2024 Your Company Name. All rights reserved."
 
 # Installer output and default installation directory
 OutFile "..\TestProgram-Setup.exe"
@@ -31,9 +31,33 @@ RequestExecutionLevel admin
 # Language
 !insertmacro MUI_LANGUAGE "English"
 
+# Function to check if Visual C++ Redistributable is installed
+Function CheckVCRedist
+    # Check if Visual C++ Redistributable is already installed
+    ReadRegDword $R0 HKLM "SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x64" "Installed"
+    ${If} $R0 != "1"
+        DetailPrint "Installing Visual C++ Redistributable..."
+        ExecWait '"$INSTDIR\VC_redist.x64.exe" /quiet /norestart' $0
+        ${If} $0 != "0"
+            MessageBox MB_OK|MB_ICONEXCLAMATION "Failed to install Visual C++ Redistributable. The program may not work correctly."
+        ${EndIf}
+    ${Else}
+        DetailPrint "Visual C++ Redistributable is already installed."
+    ${EndIf}
+FunctionEnd
+
 Section "Main Installation"
     # Set output directory for installation
     SetOutPath $INSTDIR
+
+    # Copy VC++ Redistributable installer
+    File "..\VC_redist.x64.exe"
+    
+    # Install Visual C++ Redistributable if needed
+    Call CheckVCRedist
+    
+    # Delete VC++ Redistributable installer after installation
+    Delete "$INSTDIR\VC_redist.x64.exe"
 
     # Install executable and DLLs from the bin directory
     File /r "..\bin\*.*"

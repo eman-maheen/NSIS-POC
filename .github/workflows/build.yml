@@ -59,12 +59,8 @@ jobs:
           copy test-project.exe ${{ env.SOURCE_DIR }}\deploy\bin\
           windeployqt ${{ env.SOURCE_DIR }}\deploy\bin\test-project.exe --release --compiler-runtime
           
-          # Copy MSVC Runtime DLLs directly from Windows System32
-          copy "C:\Windows\System32\msvcp140.dll" ${{ env.SOURCE_DIR }}\deploy\bin\
-          copy "C:\Windows\System32\msvcp140_1.dll" ${{ env.SOURCE_DIR }}\deploy\bin\
-          copy "C:\Windows\System32\msvcp140_2.dll" ${{ env.SOURCE_DIR }}\deploy\bin\
-          copy "C:\Windows\System32\vcruntime140.dll" ${{ env.SOURCE_DIR }}\deploy\bin\
-          copy "C:\Windows\System32\vcruntime140_1.dll" ${{ env.SOURCE_DIR }}\deploy\bin\
+          # Download Visual C++ Redistributable
+          curl -L -o "${{ env.SOURCE_DIR }}\deploy\VC_redist.x64.exe" "https://aka.ms/vs/17/release/vc_redist.x64.exe"
 
       - name: Install NSIS
         run: choco install nsis -y
