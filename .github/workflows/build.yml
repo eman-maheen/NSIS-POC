@@ -58,7 +58,7 @@ jobs:
           mkdir ${{ env.SOURCE_DIR }}\deploy\bin
           copy test-project.exe ${{ env.SOURCE_DIR }}\deploy\bin\
           windeployqt ${{ env.SOURCE_DIR }}\deploy\bin\test-project.exe --release --compiler-runtime
-          
+
           # Download Visual C++ Redistributable
           curl -L -o "${{ env.SOURCE_DIR }}\deploy\VC_redist.x64.exe" "https://aka.ms/vs/17/release/vc_redist.x64.exe"
 
@@ -75,3 +75,66 @@ jobs:
         with:
           name: TestProgram-Setup
           path: ${{ env.SOURCE_DIR }}\deploy\TestProgram-Setup.exe
+
+  release:
+    needs: build
+    runs-on: windows-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout repo for version calculation
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Calculate Version
+        id: version
+        shell: bash
+        run: |
+          latest_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          major=$(echo $latest_tag | cut -d. -f1 | tr -d 'v')
+          minor=$(echo $latest_tag | cut -d. -f2)
+          patch=$(echo $latest_tag | cut -d. -f3)
+          if git log -1 --pretty=%B | grep -i "BREAKING CHANGE\|MAJOR"; then
+            major=$((major + 1))
+            minor=0
+            patch=0
+          elif git log -1 --pretty=%B | grep -i "feat\|MINOR"; then
+            minor=$((minor + 1))
+            patch=0
+          else
+            patch=$((patch + 1))
+          fi
+          new_version="v$major.$minor.$patch"
+          echo "New version: $new_version"
+          echo "version=$new_version" >> $GITHUB_OUTPUT
+
+      - name: Download Installer Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: TestProgram-Setup
+          path: ./installer
+
+      - name: Create Release
+        id: create-release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.version.outputs.version }}
+          release_name: Release ${{ steps.version.outputs.version }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create-release.outputs.upload_url }}
+          asset_path: ./installer/TestProgram-Setup.exe
+          asset_name: TestProgram-Setup.exe
+          asset_content_type: application/octet-stream
