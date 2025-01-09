@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>308</width>
-    <height>297</height>
+    <height>311</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -120,10 +120,10 @@
       </layout>
      </widget>
     </item>
-    <item>
+    <item alignment="Qt::AlignmentFlag::AlignRight">
      <widget class="QPushButton" name="submitButton">
       <property name="text">
-       <string>Submit</string>
+       <string>Save</string>
       </property>
      </widget>
     </item>
@@ -135,7 +135,7 @@
      <x>0</x>
      <y>0</y>
      <width>308</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>
