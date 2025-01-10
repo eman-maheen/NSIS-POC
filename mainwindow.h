@@ -3,6 +3,10 @@
 
 #include <QMainWindow>
 #include <QDate>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QJsonObject>
+#include <QJsonDocument>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -17,9 +21,11 @@ public:
     ~MainWindow();
 
 private slots:
-    void onSubmitButtonClicked(); // Add this line
+    void onSubmitButtonClicked();
+    void handleNetworkResponse(QNetworkReply *reply);
 
 private:
     Ui::MainWindow *ui;
+    QNetworkAccessManager *networkManager;
 };
 #endif // MAINWINDOW_H

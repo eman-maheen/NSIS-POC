@@ -1,10 +1,13 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QMessageBox>
+#include <QNetworkRequest>
+#include <QUrlQuery>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
+    , networkManager(new QNetworkAccessManager(this))
 {
     ui->setupUi(this);
 
@@ -39,10 +42,48 @@ void MainWindow::onSubmitButtonClicked()
         return;
     }
 
-    // Show thanks message
-    QMessageBox::information(this, "Submission Successful",
-                             "Thanks for providing this information");
+    // Create JSON object
+    QJsonObject jsonObject;
+    jsonObject["name"] = name;
+    jsonObject["age"] = age;
+    jsonObject["email"] = email;
+    jsonObject["birth_date"] = birthDate.toString("yyyy-MM-dd");
+    jsonObject["gender"] = gender;
+    jsonObject["is_student"] = isStudent;
 
-    // Close the window
-    close();
+    // Convert JSON object to string
+    QJsonDocument jsonDoc(jsonObject);
+    QByteArray jsonData = jsonDoc.toJson();
+
+    // Create network request
+    QNetworkRequest request(QUrl("http://localhost:8000/users/"));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+
+    // Send POST request
+    QNetworkReply *reply = networkManager->post(request, jsonData);
+    connect(reply, &QNetworkReply::finished,
+            [this, reply]() { handleNetworkResponse(reply); });
+}
+
+void MainWindow::handleNetworkResponse(QNetworkReply *reply)
+{
+    reply->deleteLater();
+
+    if (reply->error() == QNetworkReply::NoError) {
+        // Read response data
+        QByteArray response = reply->readAll();
+        QJsonDocument jsonDoc = QJsonDocument::fromJson(response);
+        QJsonObject jsonObj = jsonDoc.object();
+
+        // Show success message
+        QMessageBox::information(this, "Success",
+                               "Data successfully submitted to the database!");
+        
+        // Close the window
+        close();
+    } else {
+        // Show error message
+        QMessageBox::critical(this, "Error",
+                            "Failed to submit data: " + reply->errorString());
+    }
 }
