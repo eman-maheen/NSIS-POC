@@ -50,3 +50,5 @@ uvicorn app.main:app --reload
 
 - API documentation available at: http://localhost:8000/docs
 - ReDoc documentation at: http://localhost:8000/redoc
+
+<!-- Testing  -->
