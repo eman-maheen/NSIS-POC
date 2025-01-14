@@ -3,8 +3,12 @@ name: Frontend Build
 on:
   push:
     branches: [ main ]
+    paths:
+      - 'frontend/**'
   pull_request:
     branches: [ main ]
+    paths:
+      - 'frontend/**'
 
 defaults:
   run:
@@ -18,7 +22,7 @@ env:
 
 jobs:
   build:
-    if: "contains(github.event.head_commit.message, 'frontend build')"
+    if: "contains(github.event.head_commit.message, '[frontend-build]')"
     runs-on: windows-latest
     steps:
       - name: Checkout repo
