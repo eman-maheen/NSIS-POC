@@ -7,10 +7,10 @@ qt_standard_project_setup()
 
 qt_add_executable(test-project
     WIN32 MACOSX_BUNDLE
-    main.cpp
-    mainwindow.cpp
-    mainwindow.h
-    mainwindow.ui
+    ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/mainwindow.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/mainwindow.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/mainwindow.ui
 )
 
 target_link_libraries(test-project
