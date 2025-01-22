@@ -15,7 +15,7 @@ defaults:
     shell: cmd
 
 env:
-  SOURCE_DIR: ${{ github.workspace }}
+  SOURCE_DIR: ${{ github.workspace }}/frontend
   QT_VERSION: 6.8.1
   BUILD_TYPE: Release
   INSTALLER_BASE_NAME: TestProgram-Setup
