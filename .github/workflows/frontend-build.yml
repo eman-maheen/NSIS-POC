@@ -16,6 +16,7 @@ defaults:
 
 env:
   SOURCE_DIR: ${{ github.workspace }}/frontend
+  BUILD_DIR: ${{ runner.temp }}\build
   QT_VERSION: 6.8.1
   BUILD_TYPE: Release
   INSTALLER_BASE_NAME: TestProgram-Setup
@@ -47,20 +48,22 @@ jobs:
 
       - name: Configure CMake
         run: |
-          mkdir -p ${{ runner.temp }}\build
-          cd ${{ runner.temp }}\build
+          mkdir -p ${{ env.BUILD_DIR }}
+          cd ${{ env.BUILD_DIR }}
           cmake ${{ env.SOURCE_DIR }} -G "Visual Studio 17 2022" -A x64 ^
           -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} ^
           -DCMAKE_PREFIX_PATH=${{ env.Qt6_DIR }}
 
       - name: Build
-        working-directory: ${{ runner.temp }}\build
+        working-directory: ${{ env.BUILD_DIR }}
         run: cmake --build . --config ${{ env.BUILD_TYPE }}
 
+      - name: Create Deploy Directory
+        run: mkdir -p ${{ env.SOURCE_DIR }}\deploy\bin
+
       - name: Deploy Qt Dependencies
-        working-directory: ${{ runner.temp }}\build\${{ env.BUILD_TYPE }}
+        working-directory: ${{ env.BUILD_DIR }}\${{ env.BUILD_TYPE }}
         run: |
-          mkdir ${{ env.SOURCE_DIR }}\deploy\bin
           copy test-project.exe ${{ env.SOURCE_DIR }}\deploy\bin\
           windeployqt ${{ env.SOURCE_DIR }}\deploy\bin\test-project.exe --release --compiler-runtime
           curl -L -o "${{ env.SOURCE_DIR }}\deploy\VC_redist.x64.exe" "https://aka.ms/vs/17/release/vc_redist.x64.exe"
@@ -79,8 +82,8 @@ jobs:
 
   release:
     needs: build
-    runs-on: windows-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: windows-latest
     permissions:
       contents: write
     
@@ -93,15 +96,11 @@ jobs:
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: latest
-          name: Release
+          name: Latest Release
           files: |
             ./installer/TestProgram-Setup.exe
-          prerelease: false
-          draft: false
-          body: Latest release of TestProgram
-          fail_on_unmatched_files: false
-          target_commitish: main
+          body: |
+            This is the latest build of the application.
+            Download this if you want the most recent version.
